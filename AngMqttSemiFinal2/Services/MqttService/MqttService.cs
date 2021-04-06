@@ -14,6 +14,9 @@ using SignalRHubs;
 
 namespace AngMqttSemiFinal2.Services.MqttService
 {
+    /// <summary>
+    /// обьект для отправки ещё под вопросом.
+    /// </summary>
     struct MqttMessages
     {
         public List<int> storedMessages;
@@ -28,7 +31,7 @@ namespace AngMqttSemiFinal2.Services.MqttService
 
         public ChartModel()
         {
-            Label = "ssuka!";
+            Label = "test label";
             Data = new List<int>() { 45, 45, 56 };
         }
     }
