@@ -10,6 +10,8 @@ import { HomeComponent } from './home/home.component';
 import { CounterComponent } from './counter/counter.component';
 import { FetchDataComponent } from './fetch-data/fetch-data.component';
 
+import { ChartModule } from 'primeng/chart'
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -27,6 +29,7 @@ import { FetchDataComponent } from './fetch-data/fetch-data.component';
       { path: 'counter', component: CounterComponent },
       { path: 'fetch-data', component: FetchDataComponent },
     ])
+    , ChartModule
   ],
   providers: [],
   bootstrap: [AppComponent]

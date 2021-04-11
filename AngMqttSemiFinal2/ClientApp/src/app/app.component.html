@@ -1,6 +1,9 @@
 <body>
   <app-nav-menu></app-nav-menu>
   <div class="container">
-    <router-outlet></router-outlet>
+
+    <p-chart type="line" [data]="data" [options]="options"></p-chart>
+    <router-outlet>
+    </router-outlet>
   </div>
 </body>
