@@ -19,13 +19,18 @@ namespace AngMqttSemiFinal2.Services
             MapClientSettings();
         }
 
+        /// <summary>
+        /// Считывание настроек брокера
+        /// </summary>
         private void MapBrokerHostSettings()
         {
             BrokerHostSettings brokerHostSettings = new BrokerHostSettings();
             configuration.GetSection(nameof(BrokerHostSettings)).Bind(brokerHostSettings);
             AppSettingsProvider.BrokerHostSettings = brokerHostSettings;
         }
-
+        /// <summary>
+        /// Считывание настроек подписчика
+        /// </summary>
         private void MapClientSettings()
         {
             ClientSettings clientSettings = new ClientSettings();
@@ -34,13 +39,17 @@ namespace AngMqttSemiFinal2.Services
         }
 
     }
-
+    /// <summary>
+    /// Настройки брокера
+    /// </summary>
     public class BrokerHostSettings
     {
         public string Host { set; get; }
         public int Port { set; get; }
     }
-
+    /// <summary>
+    /// Настройки подписчика
+    /// </summary>
     public class ClientSettings
     {
         public string Id { set; get; }

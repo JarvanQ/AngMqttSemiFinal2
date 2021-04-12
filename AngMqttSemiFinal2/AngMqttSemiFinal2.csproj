@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="ClientApp\src\app\_interfaces\chartmodel.model.ts" />
+    <None Remove="ClientApp\src\app\_interfaces\MqttMessage.model.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Include="ClientApp\src\app\_interfaces\chartmodel.model.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\_interfaces\MqttMessage.model.ts" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

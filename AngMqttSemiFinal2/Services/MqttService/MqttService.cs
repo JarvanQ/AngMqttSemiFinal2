@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -15,30 +14,13 @@ using SignalRHubs;
 namespace AngMqttSemiFinal2.Services.MqttService
 {
     /// <summary>
-    /// обьект для отправки ещё под вопросом.
+    /// обьект для отправки на клиент.
     /// </summary>
-    struct MqttMessages
+    public class MqttMessage
     {
-        public List<int> storedMessages;
-        public List<long> receivedMessages;
-        public List<long> sentMessages;
+        public long MessageValue { get; set; }
+        public string Topic { get; set; }
     }
-
-    public class ChartModel
-    {
-        public List<int> Data { get; set; }
-        public string Label { get; set; }
-
-        public ChartModel()
-        {
-            Label = "test label";
-            Data = new List<int>() { 45, 45, 56 };
-        }
-    }
-
-
-
-
 
     public class MqttClientService : IMqttClientService
     {
@@ -46,12 +28,11 @@ namespace AngMqttSemiFinal2.Services.MqttService
         private IMqttClientOptions options;
         IHubContext<MqttHub> hubContext;
 
-        MqttMessages mqttMessages = new MqttMessages()
-        {
-            storedMessages = new List<int>(),
-            receivedMessages = new List<long>(),
-            sentMessages = new List<long>()
-        };
+        private long startedStored = 0;
+        private long startedReceived = 0;
+        private long startedSent = 0;
+
+        public MqttMessage mqttMessage ;
 
         public MqttClientService(IHubContext<MqttHub> hubContext)
         {
@@ -96,11 +77,45 @@ namespace AngMqttSemiFinal2.Services.MqttService
         /// <returns></returns>
         public async Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
         {
-            await Task.Run(() => GetMessageValue(eventArgs.ApplicationMessage));
-            ChartModel cm = new ChartModel();
-            await hubContext.Clients.All.SendAsync("transferchartdata", cm);
+            await hubContext.Clients.All.SendAsync("transferchartdata", GetMessageValue(eventArgs.ApplicationMessage));
+        }
+        /// <summary>
+        /// Обработка полученого сообщения
+        /// </summary>
+        /// <param name="message">сообщение от брокера</param>
+        /// <returns>Для наглядности будем отображать грифик значений изменений данных,
+        /// а не сами данные(слишком большие числа)</returns>
+        private MqttMessage GetMessageValue(MqttApplicationMessage message)
+        {
+            var topic = message.Topic.Split(new char[] { '/' }).Last();
+            var payload = Encoding.UTF8.GetString(message.Payload);
+            mqttMessage = new MqttMessage();
+            mqttMessage.MessageValue = long.Parse(payload);
+            mqttMessage.Topic = topic;
+
+            switch (topic)
+            {
+                case "stored":
+                    if (startedStored == 0)
+                    {startedStored = mqttMessage.MessageValue;}
+                    mqttMessage.MessageValue = mqttMessage.MessageValue - startedStored;
+                    break;
+                case "received":
+                    if (startedReceived == 0)
+                    {startedReceived = mqttMessage.MessageValue;}
+                    mqttMessage.MessageValue -= startedReceived;
+                    break;
+                case "sent":
+                    if (startedSent == 0)
+                    {startedSent = mqttMessage.MessageValue;}
+                    mqttMessage.MessageValue -= startedSent;
+                    break;
+            }
+            return mqttMessage;
 
         }
+
+
 
         /// <summary>
         /// Обработчик подключения
@@ -112,9 +127,9 @@ namespace AngMqttSemiFinal2.Services.MqttService
             await mqttClient.SubscribeAsync("$SYS/broker/messages/#");
         }
 
-        public Task HandleDisconnectedAsync(MqttClientDisconnectedEventArgs eventArgs)
+        public async Task HandleDisconnectedAsync(MqttClientDisconnectedEventArgs eventArgs)
         {
-            throw new NotImplementedException();
+            await mqttClient.ConnectAsync(options);
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -141,31 +156,19 @@ namespace AngMqttSemiFinal2.Services.MqttService
             await mqttClient.DisconnectAsync();
         }
 
-        /// <summary>
-        /// Обработка полученого сообщения
-        /// </summary>
-        /// <param name="message"></param>
-        private void GetMessageValue(MqttApplicationMessage message)
-        {
-            var topic = message.Topic.Split(new char[] { '/' }).Last();
-            var payload = Encoding.UTF8.GetString(message.Payload);
-
-            switch (topic)
-            {
-                case "stored":
-                    mqttMessages.storedMessages.Add(Int32.Parse(payload));
-                    break;
-                case "received":
-                    mqttMessages.receivedMessages.Add(long.Parse(payload));
-                    break;
-                case "sent":
-                    mqttMessages.sentMessages.Add(long.Parse(payload));
-                    break;
-            }
-
-
-        }
-
-
     }
+
+    /// <summary>
+    /// Тестовые данные для более наглядного рисования грифика
+    /// </summary>
+    public static class DataManager
+    {
+        public static MqttMessage GetData()
+        {
+            var r = new Random();
+            return new MqttMessage {MessageValue = r.Next(1, 40), Topic = "stored"};
+        }
+    }
+
+
 }

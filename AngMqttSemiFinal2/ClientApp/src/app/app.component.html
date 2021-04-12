@@ -1,9 +1,6 @@
 <body>
-  <app-nav-menu></app-nav-menu>
-  <div class="container">
-
-    <p-chart type="line" [data]="data" [options]="options"></p-chart>
-    <router-outlet>
-    </router-outlet>
+<div class="container">
+    <p-chart #chart type="line" [options]="options" [data]="signalRService.chartData"></p-chart>
   </div>
 </body>
+
