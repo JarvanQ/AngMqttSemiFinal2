@@ -2,7 +2,6 @@ using AngMqttSemiFinal2.Services;
 using AngMqttSemiFinal2.Services.MqttService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,8 +25,7 @@ namespace AngMqttSemiFinal2
        
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
-           
+
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
@@ -35,7 +33,6 @@ namespace AngMqttSemiFinal2
 
             services.AddSignalR();
             services.AddHostedService<MqttClientService>();
-
 
         }
 
@@ -60,15 +57,6 @@ namespace AngMqttSemiFinal2
             }
 
             app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
-            });
-
-
 
             app.UseEndpoints(endpoints =>
             {
